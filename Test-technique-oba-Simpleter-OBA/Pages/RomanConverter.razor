@@ -1,0 +1,83 @@
+﻿@page "/"
+<h1>Roman Numeral Converter</h1>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="numberInput">Enter a number (1-9999):</label>
+                        <input class="form-control" @bind="inputText" @oninput="HandleInput" type="text" id="numberInput" />
+                    </div>
+                    <button class="btn btn-primary mt-2" @onclick="ConvertToRoman">Convert</button>
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger mt-3" role="alert">
+                            @errorMessage
+                        </div>
+                    }
+                    else if (!string.IsNullOrEmpty(romanNumeral))
+                    {
+                        <div class="alert alert-success mt-3" role="alert">
+                            Roman Numeral: @romanNumeral
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string inputText;
+    private int inputNumber;
+    public string romanNumeral;
+    public string errorMessage;
+
+    public void HandleInput(ChangeEventArgs e)
+    {
+        inputText = e.Value.ToString();
+        if (int.TryParse(inputText, out inputNumber))
+        {
+            if (inputNumber >= 1 && inputNumber <= 9999)
+            {
+                errorMessage = "";
+            }
+            else
+            {
+                errorMessage = "Veuillez entrer un nombre entre 1 et 9999.";
+            }
+        }
+        else
+        {
+            errorMessage = "Veuillez entrer un nombre naturel";
+        }
+    }
+
+    public void ConvertToRoman()
+    {
+        if (string.IsNullOrEmpty(errorMessage) && inputNumber >= 1 && inputNumber <= 9999)
+        {
+            romanNumeral = IntegerToRoman(inputNumber);
+        }
+        else
+        {
+            romanNumeral = null;
+        }
+    }
+
+    public static string IntegerToRoman(int number)
+    {
+        var thousands = new string[] { "", "M", "MM", "MMM", "MMMM", "MMMMM", "MMMMMM", "MMMMMMM", "MMMMMMMM", "MMMMMMMMM" };
+        var hundreds = new string[] { "", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM" };
+        var tens = new string[] { "", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC" };
+        var ones = new string[] { "", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX" };
+        int thousand = number / 1000;
+        int hundred = (number % 1000) / 100;
+        int ten = (number % 100) / 10;
+        int one = number % 10;
+
+        return thousands[thousand] + hundreds[hundred] + tens[ten] + ones[one];
+    }
+}
